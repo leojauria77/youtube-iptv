@@ -26,25 +26,26 @@ jobs:
           python3 -m pip install -U "yt-dlp[default]"
 
       - name: Obtener URL del directo
-        run: |
-          URL="https://www.youtube.com/live/L2KqXC9ZpX4"
+  run: |
+    URL="https://www.youtube.com/live/L2KqXC9ZpX4"
 
- STREAM=$(yt-dlp \
-  --js-runtimes deno \
-  --remote-components ejs:github \
-  --verbose \
-  -g \
-  -f 232 \
-  "$URL" | head -n 1)
+    echo "Probando yt-dlp..."
+    yt-dlp --version
 
-          if [ -z "$STREAM" ]; then
-            echo "ERROR: No se pudo obtener la URL del directo"
-            exit 1
-          fi
+    echo "Obteniendo formatos..."
+    yt-dlp \
+      --js-runtimes deno \
+      --remote-components ejs:github \
+      --list-formats \
+      "$URL"
 
-          printf '#EXTM3U\n#EXTINF:-1,YouTube Live\n%s\n' "$STREAM" > lista.m3u
-
-          echo "URL obtenida correctamente."
+    echo "Obteniendo URL..."
+    yt-dlp \
+      --js-runtimes deno \
+      --remote-components ejs:github \
+      -g \
+      -f 232 \
+      "$URL"
 
       - name: Guardar actualización
         run: |
