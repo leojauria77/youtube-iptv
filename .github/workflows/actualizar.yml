@@ -30,10 +30,11 @@ jobs:
           URL="https://www.youtube.com/live/L2KqXC9ZpX4"
 
           STREAM=$(yt-dlp \
-            --js-runtimes deno \
-            -g \
-            -f 232 \
-            "$URL" 2>/dev/null | head -n 1)
+  --js-runtimes deno \
+  --remote-components ejs:github \
+  -g \
+  -f 232 \
+  "$URL" 2>/dev/null | head -n 1)
 
           if [ -z "$STREAM" ]; then
             echo "ERROR: No se pudo obtener la URL del directo"
