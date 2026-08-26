@@ -1,0 +1,41 @@
+name: Actualizar YouTube IPTV
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/10 * * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar yt-dlp
+        run: |
+          python3 -m pip install -U yt-dlp
+
+      - name: Obtener URL del directo
+        run: |
+          URL="https://www.youtube.com/live/L2KqXC9ZpX4"
+          STREAM=$(yt-dlp -g -f 232 "$URL" 2>/dev/null | head -n 1)
+
+          if [ -z "$STREAM" ]; then
+            echo "No se pudo obtener la URL"
+            exit 1
+          fi
+
+          printf '#EXTM3U\n#EXTINF:-1,YouTube Live\n%s\n' "$STREAM" > lista.m3u
+
+      - name: Guardar actualización
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lista.m3u
+          git diff --cached --quiet || git commit -m "Actualizar URL YouTube"
+          git push
